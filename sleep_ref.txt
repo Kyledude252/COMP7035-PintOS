@@ -1,0 +1,30 @@
+--- Group ---
+Kyle Alexander
+
+--- Preliminaries ---
+None
+
+--- Data Structures ---
+Added:
+Struct list sleeping_threads
+List of all threads that are currently sleeping and waiting for their time to wake up 
+
+Edited:
+Struct thread 
+Added struct list_elem sleep
+Gives threads the ability to be used in the sleeping threads list
+Added int64_t waketime;
+Stores the time in ticks that the thread should wake up at
+
+--- Algorithms ---
+timer_sleep() now writes the time that the thread should wake up into the thread struct, then places it onto a list for sleeping threads, and blocks the thread.
+
+timer_interrupt() now goes through each thread in the list to check if any threads have reached their time to wake up, and if they should wake up, it unblocks it and removes it from the list.
+
+--- Synchronization ---
+For timer_sleep(), interrupts are disabled upon entering the function, and are reenabled at the end of the function, ensuring the adding to the list and blocking of the thread are atomic.
+
+For timer_interrupt(), it happens due to an interrupt and cannot get context switched out of, so the checking of the list and unblocking of the threads is atomic as well.
+
+--- Rationale ---
+If you have a large amount of sleeping threads then checking every element in the list may be inefficient. I am unsure if this is the most efficient way to do this, there may be better ways that I could not think of. 
